@@ -1,6 +1,7 @@
 import pygame
 import sys
 import random
+import stack
 
 # Constants
 GRID_SIZE = 20

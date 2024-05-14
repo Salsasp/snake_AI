@@ -2,20 +2,20 @@ class Stack:
     def __init__(self):
         self.items = []
 
-    def is_empty(self):
+    def empty(self):
         return len(self.items) == 0
 
     def push(self, item):
         self.items.append(item)
 
     def pop(self):
-        if not self.is_empty():
+        if not self.empty():
             return self.items.pop()
         else:
             raise IndexError("pop from an empty stack")
 
     def peek(self):
-        if not self.is_empty():
+        if not self.empty():
             return self.items[-1]
         else:
             raise IndexError("peek from an empty stack")

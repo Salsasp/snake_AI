@@ -3,6 +3,8 @@ import sys
 import random
 import math
 import queue
+import stack
+import priorityQueue
 import time
 #my attempt at a simple implementation of various reflex agent algorithms such as BFS, DFS, and UCS
 #This agent of course does not have any access to the location of the food or its other segements, so it must search
@@ -145,6 +147,55 @@ def BFS(reflexSnake):
         q.put(tileRight(currPos))
         q.put(tileDown(currPos))
     return[]
+
+def DFS(reflexSnake):
+    s = stack.Stack()
+    s.push(reflexSnake.snake[0])
+    goal = reflexSnake.food[0]
+    visited = set()
+    traversalOrder = []
+    while not s.empty(): #loop through pos tuples of grid
+        currPos = s.pop()
+        if currPos == goal:
+            traversalOrder.append(currPos)
+            return traversalOrder
+        if currPos == -1 or currPos in visited:
+            continue
+        visited.add(currPos)
+        traversalOrder.append(currPos)
+        s.push(tileLeft(currPos))
+        s.push(tileUp(currPos))
+        s.push(tileRight(currPos))
+        s.push(tileDown(currPos))
+    return[]
+
+def UCS(reflexSnake):
+    q = priorityQueue.PriorityQueue()
+    goal = reflexSnake.food[0]
+    q.put(reflexSnake.snake[0], manhattanDistance(reflexSnake.snake[0], goal))
+    visited = set()
+    traversalOrder = []
+    while not q.empty(): #loop through pos tuples of grid
+        currPos = q.get()
+        if currPos == goal:
+            traversalOrder.append(currPos)
+            return traversalOrder
+        if currPos == -1 or currPos in visited:
+            continue
+        visited.add(currPos)
+        traversalOrder.append(currPos)
+        q.put(tileLeft(currPos),manhattanDistance(currPos, goal))
+        q.put(tileUp(currPos),manhattanDistance(currPos, goal))
+        q.put(tileRight(currPos),manhattanDistance(currPos, goal))
+        q.put(tileDown(currPos),manhattanDistance(currPos, goal))
+    return[]
+
+def manhattanDistance(currPos, goal):
+    xDist1 = currPos%GRID_SIZE
+    yDist1 = currPos//GRID_SIZE
+    xDist2 = goal%GRID_SIZE
+    yDist2 = goal//GRID_SIZE
+    return abs(xDist2-xDist1) + abs(yDist2 - yDist1)
     
 def pixelPosToTilePos(x, y):
     return x//UNIT_SIZE + (y//UNIT_SIZE)*GRID_SIZE #convert pixel to corresponding tile index
@@ -169,7 +220,7 @@ def tileRight(currPos):
 
 def main(): #where shit happens
     snake = ReflexSnake()
-    snake.displayTraversal(BFS(snake))
+    snake.displayTraversal(UCS(snake))
     #snake.run()
     
 
