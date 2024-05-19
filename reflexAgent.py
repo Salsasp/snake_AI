@@ -1,17 +1,18 @@
 import pygame
 import sys
 import random
-import math
 import queue
 import stack
 import priorityQueue
-import time
+import getopt
+import argparse
+
 #my attempt at a simple implementation of various reflex agent algorithms such as BFS, DFS, and UCS
 #This agent of course does not have any access to the location of the food or its other segements, so it must search
 
 # Constants
 SCREEN_WIDTH, SCREEN_HEIGHT = 800, 800
-GRID_SIZE = 15 #N x M dimension of grid
+GRID_SIZE = 15 #N x M dimension of grid (N = M)
 UNIT_SIZE = SCREEN_WIDTH//GRID_SIZE #tile sizes scaled off screen size and specified tile amount
 FPS = 60
 LOGIC_TICK_RATE = 10
@@ -218,9 +219,45 @@ def tileRight(currPos):
         return -1
     return currPos + 1
 
+def resetUnitSize():
+    global UNIT_SIZE
+    UNIT_SIZE = SCREEN_WIDTH//GRID_SIZE
+
 def main(): #where shit happens
+    global GRID_SIZE
+    parser = argparse.ArgumentParser()
+    algorithm_mapping = {
+        "UCS": UCS,
+        "BFS": BFS,
+        "DFS": DFS
+    }
+
+    # Add argument for grid size
+    parser.add_argument("-g", "--GridSize", type=int, help="Sets NxN size of snake grid, take integers")
+
+    # Add argument for search algorithm
+    parser.add_argument("-a", "--algorithm", type=str, help="Sets the search algorithm to use")
+
+    parser.add_argument("-c", "--control", type=str, help="used to run game with ai or manually, args are \"manual\", \"ai\"")
+
+    args = parser.parse_args()
+
+    # Use the arguments
+    if args.GridSize:
+        GRID_SIZE = args.GridSize
+        resetUnitSize()
+
     snake = ReflexSnake()
-    snake.displayTraversal(UCS(snake))
+    if args.algorithm:
+        algorithm = algorithm_mapping[args.algorithm]
+
+    if args.control:
+        if args.control == "manual":
+            snake.run()
+        elif args.control == "ai":
+            snake.displayTraversal(algorithm(snake))
+
+    #snake.displayTraversal(UCS(snake))
     #snake.run()
     
 
